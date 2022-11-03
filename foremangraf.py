@@ -1,4 +1,5 @@
 from datetime import datetime
+from foreman_data import *
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -12,11 +13,20 @@ client = InfluxDBClient(url="http://192.168.213.48:8086", token=token)
 
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
-data = "patchs,type=security totalmachines=100"
+res = get_errata_count_all()
+security    = str(res[0])
+bugfix      = str(res[1])
+enhancement = str(res[2])
+total       = str(res[3])
+
+data = f"patchs,type=security totalmachines={security}"
 write_api.write(bucket, org, data)
 
-data = "patchs,type=bugfix totalmachines=150"
+data = f"patchs,type=bugfix totalmachines={bugfix}"
 write_api.write(bucket, org, data)
 
-data = "patchs,type=enhancement totalmachines=30"
+data = f"patchs,type=enhancement totalmachines={enhancement}"
+write_api.write(bucket, org, data)
+
+data = f"patchs,type=total totalmachines={total}"
 write_api.write(bucket, org, data)
