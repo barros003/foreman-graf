@@ -7,32 +7,32 @@ import logging
 
 SAT = "192.168.213.98"
 #SAT = ""
-SAT_API = f"https://{SAT}/api/"
+SAT_API = f"https://{SAT}/api/v2/"
 USERNAME = "admin"
 PASSWORD = "qjsqulVPKyvDGRwVPLIaNQ"
 #USERNAME = ""
 #PASSWORD = ""
 SSL_VERIFY = False
-ORG_ID = 3
+#ORG_ID = 3
+ORG_ID = 1
 
 
 def main_erratum():
    logging.basicConfig(level=logging.INFO, filename="main.log", format="%(asctime)s - %(levelname)s - %(message)s")
    try:
       
-      url = SAT_API + f"v2/hosts?search=name%20!~%20virt-who*%20and%20organization_id={ORG_ID}&per_page=550"
+      #url = SAT_API + f"hosts?search=name%20!~%20virt-who*%20and%20organization_id={ORG_ID}&per_page=550"
+      url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}&per_page=550"
       logging.info(f"Calling endpoint:{url}")
       r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
       r.raise_for_status()
       errata_count  = get_errata_count_all(r.json())
       errata_byhost = get_errata_count_by_host(r.json())  
    except requests.exceptions.HTTPError as err:
-      logging.error("Cannot access the endpoint:" + url + err) 
+      logging.error("Cannot access the endpoint:" + url + str(err)) 
    except requests.exceptions.Timeout as errt:
-      logging.error("Timeout accessing:" + url + errt)
-       
-  
-   logging.info(f"Endpoint ok")
+      logging.error("Timeout accessing:" + url + str(errt))   
+     
    return errata_count, errata_byhost
 
 def get_errata_count_by_host(json_return):
@@ -40,21 +40,28 @@ def get_errata_count_by_host(json_return):
     resultsjson = json_return
   
     if resultsjson:
+
          data = resultsjson["results"]
          erratum = dict()
          count = 1
+
          for entry in data:
+
            if "content_facet_attributes" in entry:             
              hostname = str(entry["certname"])
+             
+             lifecycle = entry["content_facet_attributes"]["lifecycle_environment_name"]  
+             osname    = str(entry["operatingsystem_name"])
 
              security_count = entry["content_facet_attributes"]["errata_counts"]["security"]
-             erratum.update({f"sec{count}" : {"host": hostname, "errata_type": "security", "errata_count": security_count }})              
+             erratum.update({f"sec{count}" : {"host": hostname, "errata_type": "security", "errata_count": security_count, "lifecycle": lifecycle, "osname": osname }})              
              
              bugfix_count = entry["content_facet_attributes"]["errata_counts"]["bugfix"]               
-             erratum.update({f"bug{count}": {"host": hostname, "errata_type": "bugfix", "errata_count": bugfix_count }})   
+             erratum.update({f"bug{count}": {"host": hostname, "errata_type": "bugfix", "errata_count": bugfix_count, "lifecycle": lifecycle, "osname": osname }})   
              
              enhancement_count = entry["content_facet_attributes"]["errata_counts"]["enhancement"]                
-             erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count }})
+             erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count, "lifecycle": lifecycle, "osname": osname }})                           
+             
               
              count += 1
 
@@ -68,10 +75,13 @@ def get_errata_count_all(json_return):
     bugfix_count = 0
     enhancement_count = 0
     if resultsjson:
+
         data = resultsjson["results"]
         total = resultsjson["subtotal"]
+        
         for entry in data:
            if "content_facet_attributes" in entry:
+
               if entry["content_facet_attributes"]["errata_counts"]["security"] > 0:
                 security_count += 1
                 
@@ -81,7 +91,7 @@ def get_errata_count_all(json_return):
               if entry["content_facet_attributes"]["errata_counts"]["enhancement"] > 0:
                 enhancement_count += 1            
 
-    return security_count,  bugfix_count,  enhancement_count, total
+    return security_count, bugfix_count, enhancement_count, total
  
 
 #def main():

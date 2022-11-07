@@ -9,8 +9,9 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 # You can generate a Token from the "Tokens Tab" in the UI
 token = "_v-lv3tBs3LEoxNlD8p1pYYhEfx8IVJqO4-s_R3Ti7-1j9FFFW2NN6owDH4hb6_BytJ0huQY2SQ6b4TTOqzxgA=="
 org = "myown"
-bucket = "satellite"
-sync_time = 600
+#bucket = "satellite"
+bucket = "foreman"
+sync_time = 30
 
 client = InfluxDBClient(url="http://192.168.213.48:8086", token=token)
 
@@ -25,6 +26,7 @@ def write_to_influxdb():
     bugfix      = str(res[0][1])
     enhancement = str(res[0][2])
     total       = str(res[0][3])
+  
 
     data = f"patchs,type=security totalmachines={security}"
     write_api.write(bucket, org, data) 
@@ -43,9 +45,20 @@ def write_to_influxdb():
                 
         hostname     = res[1][key]["host"]
         errata_type  = res[1][key]["errata_type"]
-        errata_count = res[1][key]["errata_count"]              
-        data = f"patchs,host={hostname} {errata_type}={errata_count}"
+        errata_count = res[1][key]["errata_count"]    
+        lifecycle    = res[1][key]["lifecycle"]       
+        osname       = str(res[1][key]["osname"])
+        osname       = osname.replace(' ', '\ ')
+        #data = f"patchs,host={hostname},lifecycle={lifecycle} {errata_type}={errata_count}"
+        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
         write_api.write(bucket, org, data)
+    
+        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
+        write_api.write(bucket, org, data)
+        
+        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
+        write_api.write(bucket, org, data)
+
     timeinminute = sync_time//60    
     logging.info(f"Next sync in: {timeinminute} minutes")
     time.sleep(sync_time)
