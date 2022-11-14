@@ -47,7 +47,7 @@ def write_to_influxdb():
         lifecycle    = res[1][key]["lifecycle"]       
         osname       = str(res[1][key]["osname"])
         osname       = osname.replace(' ', '\ ')
-        #data = f"patchs,host={hostname},lifecycle={lifecycle} {errata_type}={errata_count}"
+        
         data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
         write_api.write(bucket, org, data)
     
