@@ -2,9 +2,6 @@ import requests
 import logging
 import os
 
-
-
-#SAT = "192.168.213.98"
 SAT = os.environ.get('FOREMAN_IP')
 SAT_API = f"https://{SAT}/api/v2/"
 USERNAME = os.environ.get('FOREMAN_USER')
