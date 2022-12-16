@@ -2,24 +2,24 @@ from datetime import datetime
 from foreman_data import *
 import time
 import logging
+import os
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-# You can generate a Token from the "Tokens Tab" in the UI
-token = "_v-lv3tBs3LEoxNlD8p1pYYhEfx8IVJqO4-s_R3Ti7-1j9FFFW2NN6owDH4hb6_BytJ0huQY2SQ6b4TTOqzxgA=="
-org = "myown"
-#bucket = "satellite"
-bucket = "foreman"
-sync_time = 30
-
-client = InfluxDBClient(url="http://192.168.213.48:8086", token=token)
-
-write_api = client.write_api(write_options=SYNCHRONOUS)
-
 def write_to_influxdb():
- while True:
-    logging.basicConfig(level=logging.INFO, filename="main.log", format="%(asctime)s - %(levelname)s - %(message)s")
+
+ try:
+
+  token = os.environ.get('INFLUX_TOKEN')
+  org = os.environ.get('INFLUX_ORG')
+  bucket = os.environ.get('INFLUX_BUCKET')
+  sync_time = os.environ.get('SYNC_TIME')
+  influx_url = os.environ.get('INFLUX_URL')
+  
+
+  while True:
+    logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
     logging.info("Starting new sync sequence")
     res = main_erratum()
     security    = str(res[0][0])
@@ -28,6 +28,8 @@ def write_to_influxdb():
     total       = str(res[0][3])
   
 
+    client = InfluxDBClient(url=f"{influx_url}", token=token)
+    write_api = client.write_api(write_options=SYNCHRONOUS)
     data = f"patchs,type=security totalmachines={security}"
     write_api.write(bucket, org, data) 
 
@@ -49,7 +51,7 @@ def write_to_influxdb():
         lifecycle    = res[1][key]["lifecycle"]       
         osname       = str(res[1][key]["osname"])
         osname       = osname.replace(' ', '\ ')
-        #data = f"patchs,host={hostname},lifecycle={lifecycle} {errata_type}={errata_count}"
+        
         data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
         write_api.write(bucket, org, data)
     
@@ -59,8 +61,12 @@ def write_to_influxdb():
         data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
         write_api.write(bucket, org, data)
 
-    timeinminute = sync_time//60    
-    logging.info(f"Next sync in: {timeinminute} minutes")
-    time.sleep(sync_time)
-        
+  
+    logging.info(f"Next sync in: {sync_time} minutes")
+    time.sleep(int(sync_time) * 60)
+
+ except:
+    time.sleep(60)
+    write_to_influxdb()
+
 write_to_influxdb()

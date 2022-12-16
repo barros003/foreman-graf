@@ -1,37 +1,34 @@
-import json
-import sys
 import requests
 import logging
+import os
 
-
-
-SAT = "192.168.213.98"
-#SAT = ""
+SAT = os.environ.get('FOREMAN_IP')
 SAT_API = f"https://{SAT}/api/v2/"
-USERNAME = "admin"
-PASSWORD = "qjsqulVPKyvDGRwVPLIaNQ"
-#USERNAME = ""
-#PASSWORD = ""
+USERNAME = os.environ.get('FOREMAN_USER')
+PASSWORD = os.environ.get('FOREMAN_TOKEN')
 SSL_VERIFY = False
-#ORG_ID = 3
-ORG_ID = 1
-
+ORG_ID = os.environ.get('FOREMAN_ORGID')
 
 def main_erratum():
-   logging.basicConfig(level=logging.INFO, filename="main.log", format="%(asctime)s - %(levelname)s - %(message)s")
+   logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
    try:
-      
-      #url = SAT_API + f"hosts?search=name%20!~%20virt-who*%20and%20organization_id={ORG_ID}&per_page=550"
-      url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}&per_page=550"
-      logging.info(f"Calling endpoint:{url}")
-      r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
-      r.raise_for_status()
-      errata_count  = get_errata_count_all(r.json())
-      errata_byhost = get_errata_count_by_host(r.json())  
+
+      totalpages = get_totalHosts()
+
+      if totalpages:
+        url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}&per_page={totalpages}"
+        logging.info(f"Calling endpoint: {url}")
+        r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
+        r.raise_for_status()
+        errata_count  = get_errata_count_all(r.json())
+        errata_byhost = get_errata_count_by_host(r.json())
+      else:
+        logging.error(f"Cannot connect to {url}, retrying in a few minutes")
+
    except requests.exceptions.HTTPError as err:
-      logging.error("Cannot access the endpoint:" + url + str(err)) 
+      logging.error(f"Cannot access the endpoint: {url}") 
    except requests.exceptions.Timeout as errt:
-      logging.error("Timeout accessing:" + url + str(errt))   
+      logging.error(f"Timeout accessing: {url}")   
      
    return errata_count, errata_byhost
 
@@ -61,8 +58,7 @@ def get_errata_count_by_host(json_return):
              
              enhancement_count = entry["content_facet_attributes"]["errata_counts"]["enhancement"]                
              erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count, "lifecycle": lifecycle, "osname": osname }})                           
-             
-              
+                          
              count += 1
 
     return erratum  
@@ -92,13 +88,15 @@ def get_errata_count_all(json_return):
                 enhancement_count += 1            
 
     return security_count, bugfix_count, enhancement_count, total
+
+def get_totalHosts ():
  
+ try:
 
-#def main():
-    
-    #get_errata_count_by_host("security")
-    #testedict()
-    
-
-#if __name__ == "__main__":
-#    main()
+   url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}"
+   logging.info(f"get total hosts:{url}")
+   r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
+   totalhosts = r.json()   
+   return totalhosts["subtotal"]
+ except:
+   logging.error(f"Cannot access the endpoint: {url}")
