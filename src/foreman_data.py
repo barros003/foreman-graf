@@ -2,8 +2,8 @@ import requests
 import logging
 import os
 
-SAT = os.environ.get('FOREMAN_IP')
-SAT_API = f"https://{SAT}/api/v2/"
+FOREMAN = os.environ.get('FOREMAN_HOST')
+FOREMAN_API = f"https://{FOREMAN}/api/v2/"
 USERNAME = os.environ.get('FOREMAN_USER')
 PASSWORD = os.environ.get('FOREMAN_TOKEN')
 SSL_VERIFY = False
@@ -13,17 +13,17 @@ def main_erratum():
    logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
    try:
 
-      totalpages = get_totalHosts()
+      totalpages = get_totalhosts()
 
       if totalpages:
-        url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}&per_page={totalpages}"
-        logging.info(f"Calling endpoint: {url}")
+        url = FOREMAN_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}&per_page={totalpages}"
+        logging.info(f"getting info: {url}")
         r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
         r.raise_for_status()
         errata_count  = get_errata_count_all(r.json())
         errata_byhost = get_errata_count_by_host(r.json())
       else:
-        logging.error(f"Cannot connect to {url}, retrying in a few minutes")
+        logging.error(f"Cannot connect to {url}")
 
    except requests.exceptions.HTTPError as err:
       logging.error(f"Cannot access the endpoint: {url}") 
@@ -89,11 +89,11 @@ def get_errata_count_all(json_return):
 
     return security_count, bugfix_count, enhancement_count, total
 
-def get_totalHosts ():
+def get_totalhosts ():
  
  try:
 
-   url = SAT_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}"
+   url = FOREMAN_API + f"hosts?search=hypervisor%20%3D%20false%20and%20organization_id={ORG_ID}"
    logging.info(f"get total hosts:{url}")
    r = requests.get(url, auth=(USERNAME, PASSWORD), verify=SSL_VERIFY)
    totalhosts = r.json()   
