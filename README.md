@@ -12,7 +12,7 @@
 - FOREMAN_TOKEN=user token
 - FOREMAN_ORGID=1 (you can get it by running the command: hammer organization list)
 
-you can create a file with the variables and run the following docker command:
+you can create a file with these variables and run the following docker command:
 
 - docker run  -d  --env-file ./env.list --restart=always --name foreman_influx barros003/foreman_to_influx:latest
 
