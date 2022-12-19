@@ -10,7 +10,7 @@
 - FOREMAN_HOST=foreman.example.com
 - FOREMAN_USER= foreman user
 - FOREMAN_TOKEN=user token
-- FOREMAN_ORGID=1 (you can get running the command: hammer organization list)
+- FOREMAN_ORGID=1 (you can get it by running the command: hammer organization list)
 
 you can create a file with the variables and run the following docker command:
 
