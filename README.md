@@ -16,6 +16,6 @@ you can create a file with these variables and run the following docker command:
 
 - docker run  -d  --env-file ./env.list --restart=always --name foreman_influx barros003/foreman_to_influx:latest
 
-## 3 . import the dashboard to grafana and configure the datasource pointing to influxdb2 (choose flux in query language option)
+## 3 . import the dashboard to grafana and configure the datasource pointing to influxdb2 (choose flux in query language option), also you will need to adjust the bucket name on the panels.
 
 <a href="https://ibb.co/Wcfjf3V"><img src="https://i.ibb.co/JzHgHd3/grafana-painel.jpg" alt="grafana-painel" border="0" /></a>
