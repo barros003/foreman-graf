@@ -1,3 +1,7 @@
+## Requirements
+- influxdb2
+- grafana v9+
+
 ## 1. Start influxdb 2.0 container, see https://hub.docker.com/_/influxdb
 
 ## 2. start the container that contains this scripts, it will get info from foreman/satellite and write to influxdb, you need to run  the docker command with the following variables:
