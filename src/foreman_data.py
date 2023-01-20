@@ -67,7 +67,6 @@ def get_errata_count_by_host(json_return):
 
     return erratum  
 
-
 def get_errata_count_all(json_return):
  
     resultsjson = json_return

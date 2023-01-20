@@ -15,8 +15,7 @@ def write_to_influxdb():
   org = os.environ.get('INFLUX_ORG')
   bucket = os.environ.get('INFLUX_BUCKET')
   sync_time = os.environ.get('SYNC_TIME')
-  influx_url = os.environ.get('INFLUX_URL')
-  
+  influx_url = os.environ.get('INFLUX_URL')  
 
   while True:
     logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
@@ -25,8 +24,7 @@ def write_to_influxdb():
     security    = str(res[0][0])
     bugfix      = str(res[0][1])
     enhancement = str(res[0][2])
-    total       = str(res[0][3])
-  
+    total       = str(res[0][3])  
 
     client = InfluxDBClient(url=f"{influx_url}", token=token)
     write_api = client.write_api(write_options=SYNCHRONOUS)
@@ -40,11 +38,10 @@ def write_to_influxdb():
     write_api.write(bucket, org, data)
     
     data = f"patchs,type=total totalmachines={total}"
-    write_api.write(bucket, org, data)
-    
+    write_api.write(bucket, org, data)    
 
     for key in res[1]:
-                
+                        
         hostname     = res[1][key]["host"]
         errata_type  = res[1][key]["errata_type"]
         errata_count = res[1][key]["errata_count"]    
