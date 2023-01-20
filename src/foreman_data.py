@@ -57,7 +57,11 @@ def get_errata_count_by_host(json_return):
              erratum.update({f"bug{count}": {"host": hostname, "errata_type": "bugfix", "errata_count": bugfix_count, "lifecycle": lifecycle, "osname": osname }})   
              
              enhancement_count = entry["content_facet_attributes"]["errata_counts"]["enhancement"]                
-             erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count, "lifecycle": lifecycle, "osname": osname }})                           
+             erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count, "lifecycle": lifecycle, "osname": osname }})      
+
+             packages_count = entry["content_facet_attributes"]["upgradable_package_count"]               
+             erratum.update({f"pack{count}": {"host": hostname, "errata_type": "totalpackages", "errata_count": packages_count, "lifecycle": lifecycle, "osname": osname }})                           
+                                               
                           
              count += 1
 

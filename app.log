@@ -1,0 +1,3 @@
+2023-01-20 14:53:10,377 - INFO - Starting new sync sequence
+2023-01-20 14:53:10,377 - INFO - get total hosts:https://None/api/v2/hosts?search=hypervisor%20%3D%20false%20and%20organization_id=None
+2023-01-20 14:53:12,658 - ERROR - Cannot access the endpoint: https://None/api/v2/hosts?search=hypervisor%20%3D%20false%20and%20organization_id=None

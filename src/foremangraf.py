@@ -54,13 +54,6 @@ def write_to_influxdb():
         
         data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
         write_api.write(bucket, org, data)
-    
-        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
-        write_api.write(bucket, org, data)
-        
-        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
-        write_api.write(bucket, org, data)
-
   
     logging.info(f"Next sync in: {sync_time} minutes")
     time.sleep(int(sync_time) * 60)
