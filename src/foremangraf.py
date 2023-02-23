@@ -18,7 +18,7 @@ def write_to_influxdb():
   influx_url = os.environ.get('INFLUX_URL')  
 
   while True:
-    logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=logging.INFO, filename="src/app.log", format="%(asctime)s - %(levelname)s - %(message)s")
     logging.info("Starting new sync sequence")
     res = main_erratum()
     security    = str(res[0][0])

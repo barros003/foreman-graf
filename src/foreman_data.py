@@ -10,7 +10,7 @@ SSL_VERIFY = False
 ORG_ID = os.environ.get('FOREMAN_ORGID')
 
 def main_erratum():
-   logging.basicConfig(level=logging.INFO, filename="app.log", format="%(asctime)s - %(levelname)s - %(message)s")
+   logging.basicConfig(level=logging.INFO, filename="src/app.log", format="%(asctime)s - %(levelname)s - %(message)s")
    try:
 
       totalpages = get_totalhosts()
@@ -60,9 +60,8 @@ def get_errata_count_by_host(json_return):
              erratum.update({f"enha{count}": {"host": hostname, "errata_type": "enhancement", "errata_count": enhancement_count, "lifecycle": lifecycle, "osname": osname }})      
 
              packages_count = entry["content_facet_attributes"]["upgradable_package_count"]               
-             erratum.update({f"pack{count}": {"host": hostname, "errata_type": "totalpackages", "errata_count": packages_count, "lifecycle": lifecycle, "osname": osname }})                           
-                                               
-                          
+             erratum.update({f"pack{count}": {"host": hostname, "errata_type": "totalpackages", "errata_count": packages_count, "lifecycle": lifecycle, "osname": osname }})          
+                                     
              count += 1
 
     return erratum  
