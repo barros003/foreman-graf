@@ -1,6 +1,9 @@
 import requests
 import logging
 import os
+import sys
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 FOREMAN = os.environ.get('FOREMAN_HOST')
 FOREMAN_API = f"https://{FOREMAN}/api/v2/"
@@ -9,8 +12,16 @@ PASSWORD = os.environ.get('FOREMAN_TOKEN')
 SSL_VERIFY = False
 ORG_ID = os.environ.get('FOREMAN_ORGID')
 
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler)
+
 def main_erratum():
-   logging.basicConfig(level=logging.INFO, filename="src/app.log", format="%(asctime)s - %(levelname)s - %(message)s")
+  
    try:
 
       totalpages = get_totalhosts()
@@ -28,7 +39,7 @@ def main_erratum():
    except requests.exceptions.HTTPError as err:
       logging.error(f"Cannot access the endpoint: {url}") 
    except requests.exceptions.Timeout as errt:
-      logging.error(f"Timeout accessing: {url}")   
+      logging.error(f"Timeout accessing: {url}")  
      
    return errata_count, errata_byhost
 
