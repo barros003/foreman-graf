@@ -25,33 +25,39 @@ def write_to_influxdb():
     bugfix      = str(res[0][1])
     enhancement = str(res[0][2])
     total       = str(res[0][3])  
-
-    client = InfluxDBClient(url=f"{influx_url}", token=token)
-    write_api = client.write_api(write_options=SYNCHRONOUS)
-    data = f"patchs,type=security totalmachines={security}"
-    write_api.write(bucket, org, data) 
-
-    data = f"patchs,type=bugfix totalmachines={bugfix}"
-    write_api.write(bucket, org, data)
     
-    data = f"patchs,type=enhancement totalmachines={enhancement}"
-    write_api.write(bucket, org, data)
-    
-    data = f"patchs,type=total totalmachines={total}"
-    write_api.write(bucket, org, data)    
-
-    for key in res[1]:
-                        
-        hostname     = res[1][key]["host"]
-        errata_type  = res[1][key]["errata_type"]
-        errata_count = res[1][key]["errata_count"]    
-        lifecycle    = res[1][key]["lifecycle"]       
-        osname       = str(res[1][key]["osname"])
-        osname       = osname.replace(' ', '\ ')
+    try:
+       
+        client = InfluxDBClient(url=f"{influx_url}", token=token)
+        write_api = client.write_api(write_options=SYNCHRONOUS)
         
-        data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
+        data = f"patchs,type=security totalmachines={security}"
+        write_api.write(bucket, org, data) 
+        
+        data = f"patchs,type=bugfix totalmachines={bugfix}"
+        write_api.write(bucket, org, data)    
+        
+        data = f"patchs,type=enhancement totalmachines={enhancement}"
         write_api.write(bucket, org, data)
-  
+    
+        data = f"patchs,type=total totalmachines={total}"
+        write_api.write(bucket, org, data)    
+
+        for key in res[1]:
+                        
+            hostname     = res[1][key]["host"]
+            errata_type  = res[1][key]["errata_type"]
+            errata_count = res[1][key]["errata_count"]    
+            lifecycle    = res[1][key]["lifecycle"]       
+            osname       = str(res[1][key]["osname"])
+            osname       = osname.replace(' ', '\ ')
+        
+            data = f"patchs,host={hostname},lifecycle={lifecycle},osname={osname} {errata_type}={errata_count}"
+            write_api.write(bucket, org, data)
+
+    except:
+        logging.error(f"Cannot access influxDB")
+
     logging.info(f"Next sync in: {sync_time} minutes")
     time.sleep(int(sync_time) * 60)
 
