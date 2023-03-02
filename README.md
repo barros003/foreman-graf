@@ -1,5 +1,5 @@
-## These scripts get info from foreman/satellite and populate the influxdb, that is used as datasource to grafana where you can make the painels.
-## it get the following info to influxdb
+## These scripts get info from foreman/satellite and populate the influxdb, that is used as datasource to grafana where you can build the painels.
+## It gets the following info to influxdb
 - number of registered servers on foreman/satellite
 - number of servers with security,bugfix and enhancement pending updates
 - number of pending update per server according with the type security,bugfix and enhancement
@@ -10,7 +10,7 @@
 
 ## 1. Start influxdb 2.0 container, see https://hub.docker.com/_/influxdb
 
-## 2. start the container that contains this scripts, it will get info from foreman/satellite and write to influxdb, you need to run  the docker command with the following variables:
+## 2. start the container that contains this scripts, it will get info from foreman/satellite and populate the influxdb, you need to run  the docker command with the following variables:
 
 - INFLUX_TOKEN=influxdb user token  
 - INFLUX_ORG=org name
