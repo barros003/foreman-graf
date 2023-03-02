@@ -1,3 +1,9 @@
+## These scripts get info from foreman/satellite and populate the influxdb, that is used as datasource to grafana where you can make the painels.
+## it get the following info to influxdb
+- number of registered servers on foreman/satellite
+- number of servers with security,bugfix and enhancement pending updates
+- number of pending update per server according with the type security,bugfix and enhancement
+
 ## Requirements
 - influxdb2
 - grafana v9+
